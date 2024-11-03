@@ -14,17 +14,11 @@ unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 default_random_engine generator(seed);
 uniform_real_distribution<double> distribution (0,1);
 
-long long unitDist(long long x, long long c, int srs = 0){
-    /*
-    if(srs){
-        return (x - c) * (x - c);
-    }
-    if(abs(x - c) <= n) return 0;*/
-    //return x != c;
+long long unitDist(long long x, long long c){
     return (x - c) * (x - c) * (x - c) * (x - c) * (x - c) * (x - c);
 }
 
-long long distanceMat(vector<int> arr, int srs = 0){
+long long distanceMat(vector<int> arr){
     vector<int> sumHor(n, 0);
     vector<int> sumVer(n, 0);
     assert(arr.size() == n * n);
@@ -34,44 +28,30 @@ long long distanceMat(vector<int> arr, int srs = 0){
     }
     long long ans = 0;
     for(int i = 0; i < n; i++){
-        ans += unitDist(sumHor[i], c, srs);
-        ans += unitDist(sumVer[i], c, srs);
+        ans += unitDist(sumHor[i], c);
+        ans += unitDist(sumVer[i], c);
     }
     return ans;
 }
 
-vector<int> distanceMatVec(vector<int> arr, int srs = 0){
-    vector<int> sumHor(n, 0);
-    vector<int> sumVer(n, 0);
-    assert(arr.size() == n * n);
-    for(int i = 0; i < n * n; i++){
-        sumHor[i / n] += arr[i];
-        sumVer[i % n] += arr[i];
-    }
-    sumHor.insert(sumHor.end(), sumVer.begin(), sumVer.end());
-    return sumHor;
-}
-
-vector<int> distanceVec(vector<int> arr, int srs = 0){
+vector<int> distanceVec(vector<int> arr){
     vector<int> sumPillar(n * n, 0);
     vector<int> ans;
-    for(int i = 0; i < arr.size(); i += n * n){
+    for(int i = 0; i < (int)arr.size(); i += n * n){
         vector<int> temp;
         vector<int> sumHor(n, 0);
         for(int j = i; j < i + n * n; j++){
             sumPillar[j % (n * n)] += arr[j];
             sumHor[(j / n) % n] += arr[j];
         }
-        //vector<int> dm = distanceMatVec(temp, srs);
         ans.insert(ans.end(), sumHor.begin(), sumHor.end());
     }
-    for(int i = 0; i < arr.size(); i += n * n){
+    for(int i = 0; i < (int)arr.size(); i += n * n){
         vector<int> temp;
         vector<int> sumVer(n, 0);
         for(int j = i; j < i + n * n; j++){
             sumVer[j % n] += arr[j];
         }
-        //vector<int> dm = distanceMatVec(temp, srs);
         ans.insert(ans.end(), sumVer.begin(), sumVer.end());
     }
     ans.insert(ans.end(), sumPillar.begin(), sumPillar.end());
@@ -256,20 +236,20 @@ long long distanceEff(int pos1, int pos2, long long curDist, vector<int> &cube, 
 }
 
 
-long long distance(vector<int> &arr, int srs = 0){
+long long distance(vector<int> &arr){
     int cnt = 0;
     vector<int> sumPillar(n * n, 0);
     long long ans = 0;
-    for(int i = 0; i < arr.size(); i += n * n){
+    for(int i = 0; i < (int)arr.size(); i += n * n){
         vector<int> temp;
         for(int j = i; j < i + n * n; j++){
             sumPillar[j % (n * n)] += arr[j];
             temp.push_back(arr[j]);
         }
-        ans += distanceMat(temp, srs);
+        ans += distanceMat(temp);
     }
     for(int i = 0; i < n * n; i++){
-        ans += unitDist(sumPillar[i], c, srs);
+        ans += unitDist(sumPillar[i], c);
     }
     int r1 = 0, c1 = 0;
     int r2 = 0, c2 = n - 1;
@@ -286,10 +266,10 @@ long long distance(vector<int> &arr, int srs = 0){
         r3--; c3++;
         r4--; c4--;
     }
-    ans += unitDist(s1, c, srs);
-    ans += unitDist(s2, c, srs);
-    ans += unitDist(s3, c, srs);
-    ans += unitDist(s4, c, srs);
+    ans += unitDist(s1, c);
+    ans += unitDist(s2, c);
+    ans += unitDist(s3, c);
+    ans += unitDist(s4, c);
     for(int k = 0; k < n; k++){
         int i1 = 0, j1 = 0;
         int i2 = 0, j2 = n - 1;
@@ -309,59 +289,22 @@ long long distance(vector<int> &arr, int srs = 0){
             i1++; i2++;
             j1++; j2--;
         }
-        ans += unitDist(st1, c, srs);
-        ans += unitDist(st2, c, srs);
-        ans += unitDist(st3, c, srs);
-        ans += unitDist(st4, c, srs);
-        //ans += unitDist(st5, c, srs);
-        //ans += unitDist(st6, c, srs);
+        ans += unitDist(st1, c);
+        ans += unitDist(st2, c);
+        ans += unitDist(st3, c);
+        ans += unitDist(st4, c);
+        //ans += unitDist(st5, c);
+        //ans += unitDist(st6, c);
     }
     return ans;
-}
-
-double getRandomNumber(double i,double j){
-    //cout<<"returning "<<(double(distribution(generator)))<<"\n";
-    return double(distribution(generator));
 }
 
 double getProbability(long long difference, double temperature){
     return exp(-1 * difference / temperature);
 }
 
-/*
-int getRandomInt(int mini, int maxi){
-    random_device dev;
-    mt19937 rng(dev());
-    uniform_int_distribution<mt19937::result_type> dist(mini, maxi);
-    return dist(rng);
-}
-
-void evalAnswer(){
-    cin >> n;
-    vector<int> arr(n * n * n);
-    for(auto &x: arr) cin >> x;
-    int mini = INT_MAX;
-    c = n * (n * n * n + 1);
-    c /= 2;
-    int u = distance(arr);
-    for(int i = 0; i < n * n * n; i++){
-        for(int j = i + 1; j < n * n * n; j++){
-            swap(arr[i], arr[j]);
-            int k = distance(arr);
-            mini = min(mini, k);
-            swap(arr[i], arr[j]);
-        }
-    }
-    for(auto &x: distanceVec(arr)){
-        cout << x << " ";
-    }
-    cout << endl;
-    cout << u << endl;
-    cout << endl << " " << mini << endl;
-}*/
-
 int32_t main(){
-    //evalAnswer();
+    cout << "Type 5 and hit Enter to start." << endl;
     cin >> n;
     auto beg = high_resolution_clock::now();
     c = n * (n * n * n + 1);
@@ -378,7 +321,6 @@ int32_t main(){
 
     uniform_int_distribution<mt19937::result_type> dist1(0, n * n * n - 1);
     uniform_int_distribution<mt19937::result_type> dist2(0, n * n * n - 2);
-
 
     vector<int> ans;
     long long curDist = distance(cube);
@@ -419,72 +361,37 @@ int32_t main(){
             swap(cube[pos1], cube[pos2]);
         }
 
-        /*if(testingDist != newDist ){
-           cout << "FATAL " << testingDist << " " << newDist << " " << pos1 << " " << pos2 << " " << x1 << " " << x2 << endl;
-           for(int i = 0; i < sumVec.size(); i++){
-                if(sumVec[i] != bebas[i]){
-                    cout << i << " " << sumVec[i] << " " << newDistCube[i] << endl;
-                }
-           }
-           cout << endl;
-           for(int i = 0; i < sumVec.size(); i++){
-                if(sumVec[i] != newDistCube[i]){
-                    cout << i << " " << sumVec[i] << " " << newDistCube[i] << endl;
-                }
-           }
-           /*
-           for(auto &x: sumVec) cout << x << " ";
-           cout << endl;
-           for(auto &x: newDistCube) cout << x << " ";
-           cout << endl;
-        }*/
         if(steps % 1000000 == 0){
             cout << curDist << " " << steps << endl;
             logs << curDist << " " << steps << endl;
             delog << currentdE << " " << steps << endl;
-            /*if(testingDist != newDist ){
-               cout << "FATAL " << testingDist << " " << newDist << " " << pos1 << " " << pos2 << " " << x1 << " " << x2 << endl;
-               for(int i = 0; i < sumVec.size(); i++){
-                    if(sumVec[i] != bebas[i]){
-                        cout << i << " " << sumVec[i] << " " << newDistCube[i] << endl;
-                    }
-               }
-               cout << endl;
-               for(int i = 0; i < sumVec.size(); i++){
-                    if(sumVec[i] != newDistCube[i]){
-                        cout << i << " " << sumVec[i] << " " << newDistCube[i] << endl;
-                    }
-               }
-               /*
-               for(auto &x: sumVec) cout << x << " ";
-               cout << endl;
-               for(auto &x: newDistCube) cout << x << " ";
-               cout << endl;*/
-            //}
         }
     }
-
+    assert(distance(ans) == mini);
     logs.close();
     delog.close();
     cout << "Steps: " << steps << endl;
-    cout << distance(ans, 1) << endl;
+    cout << distance(ans) << endl;
     cout << "Real Array: " << endl;
     for(auto &x: ans){
         cout << x << " ";
     }
     cout << endl;
     cout << "Cost func: " << endl;
-    for(auto &x: distanceVec(ans, 1)){
+    for(auto &x: distanceVec(ans)){
         cout << x << " ";
     }
     cout << endl;
     cout.precision(18);
-    cout << temperature << endl;
+    cout << "Temperature: " << temperature << endl;
     auto en = high_resolution_clock::now();
     auto dur = duration_cast<microseconds>(en - beg);
-    cout << dur.count() << endl;
+    cout << "Duration (in microsec): " << dur.count() << endl;
     int u = 1;
-    system("C:/Python312/python.exe plot.py annealing_log.txt I log && C:/Python312/python.exe plot.py annealing_delta_e_log.txt F linear");
+
+    ///** Sesuaikan dengan sistem anda! **/
+    system("C:/Python312/python.exe plot.py annealing_log.txt I log && C:/Python312/python.exe plot.py annealing_delta_e_log.txt F linear");\
+
     while(u != 2){ cin >> u; }
     return 0;
 }
