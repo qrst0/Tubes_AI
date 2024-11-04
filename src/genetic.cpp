@@ -490,11 +490,24 @@ int32_t main(){
 
     // make the cube
     vector<vector<int>> population = makePopulation(nPop, n);
+
     cout << "Start Population: \n";
     for (int i = 0; i < population.size(); i++) {
         cout << "Cube " << i+1 << ": \n";
         printCube(population[i]);
     }
+
+    // visualize start population
+    ofstream cf("cube_genetic.txt");
+    for (int i = 0; i < population.size(); i++) {
+        cf << "Start Population Cube " << i+1 << endl;
+        for(auto &x: population[i]){
+            cf << x << " ";
+        }
+        cf << endl;
+    }
+    system("C:/Python/Python312/python.exe plot_cube_genetic.py cube_genetic.txt \"Starting Cube\" ");
+    cf.close();
     
     for (int i = 0; i < population.size(); i++) {
         long long fitness = distance(population[i]);
@@ -541,6 +554,18 @@ int32_t main(){
         printCube(population[i]);
     }
 
+    // visualize end population 
+    ofstream ef("cube_genetic.txt");
+    for (int i = 0; i < population.size(); i++) {
+        ef << "End Population Cube " << i+1 << endl;
+        for(auto &x: population[i]){
+            ef << x << " ";
+        }
+        ef << endl;
+    }
+    system("C:/Python/Python312/python.exe plot_cube_genetic.py cube_genetic.txt \"Starting Cube\" ");
+    ef.close();
+
     for (int i = 0; i < population.size(); i++) {
         cout << "Fitness Cube " << i+1 << ": " << distance(population[i]) << "\n";
     }
@@ -558,7 +583,9 @@ int32_t main(){
     cout << "Duration (in microsec): " << dur.count() << endl;
     
     ///** Sesuaikan dengan sistem anda! **/
-    system("C:/Python312/python.exe plot_genetic.py genetic_log.txt I log");\
+    system("C:/Python/Python312/python.exe plot_genetic.py genetic_log.txt I log");\
+
+    logs.close();
 
     int u = 1;
     while(u != 2){ cin >> u; }

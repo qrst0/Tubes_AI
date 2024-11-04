@@ -42,5 +42,5 @@ avgPoints = np.array(avgPoints)
 
 plt.plot(itrPoints, optPoints, label = "Optimum")
 plt.plot(itrPoints, avgPoints, label = "Average")
-plt.legend()
+plt.legend()  
 plt.show()
