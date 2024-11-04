@@ -17,7 +17,7 @@
 
 ### Deskripsi Singkat Repository
 Repository ini berisi implementasi dari tiga algoritma local search untuk menyelesaikan permasalahan Diagonal Magic Cube berukuran 5x5x5. Permasalahan ini bertujuan untuk menyusun angka-angka pada kubus agar memenuhi properti-properti tertentu, termasuk jumlah angka yang sama pada tiap baris, kolom, tiang, dan diagonal ruang. Algoritma yang diimplementasikan meliputi:
-- **Hill-Climbing** (dengan varian Steepest Ascent)
+- **Hill-Climbing**
 - **Simulated Annealing**
 - **Genetic Algorithm**
 
@@ -45,7 +45,7 @@ Repository ini berisi implementasi dari tiga algoritma local search untuk menyel
 ### Pembagian Tugas
 
 - **Ariel Herfrison (13522002)**: Implementasi dan Eksperimen Genetic Algorithm.
-- **Andhika Tantyo Anugrah (13522094)**: Implementasi dan Eksperimen Hill-Climbing Algorithm (Steepest Ascent).
+- **Andhika Tantyo Anugrah (13522094)**: Implementasi dan Eksperimen Hill-Climbing Algorithm.
 - **Kristo Anugrah (13522024)**: Implementasi dan Eksperimen Simulated Annealing Algorithm.
 - **Chelvadinda (13522154)**: Membuat laporan.
 
