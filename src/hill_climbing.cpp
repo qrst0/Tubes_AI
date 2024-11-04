@@ -1,5 +1,6 @@
 #include <bits/stdc++.h>
 #include <ctime>
+#include <vector>
 
 using namespace std;
 using namespace std::chrono;
@@ -14,17 +15,13 @@ unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 default_random_engine generator(seed);
 uniform_real_distribution<double> distribution (0,1);
 
-long long unitDist(long long x, long long c, int srs = 0){
-    /*
-    if(srs){
-        return (x - c) * (x - c);
-    }
-    if(abs(x - c) <= n) return 0;*/
-    //return x != c;
+// From annealing.cpp
+long long unitDist(long long x, long long c){
     return (x - c) * (x - c) * (x - c) * (x - c) * (x - c) * (x - c);
 }
 
-long long distanceMat(vector<int> arr, int srs = 0){
+// From annealing.cpp
+long long distanceMat(vector<int> arr){
     vector<int> sumHor(n, 0);
     vector<int> sumVer(n, 0);
     assert(arr.size() == n * n);
@@ -34,44 +31,31 @@ long long distanceMat(vector<int> arr, int srs = 0){
     }
     long long ans = 0;
     for(int i = 0; i < n; i++){
-        ans += unitDist(sumHor[i], c, srs);
-        ans += unitDist(sumVer[i], c, srs);
+        ans += unitDist(sumHor[i], c);
+        ans += unitDist(sumVer[i], c);
     }
     return ans;
 }
 
-vector<int> distanceMatVec(vector<int> arr, int srs = 0){
-    vector<int> sumHor(n, 0);
-    vector<int> sumVer(n, 0);
-    assert(arr.size() == n * n);
-    for(int i = 0; i < n * n; i++){
-        sumHor[i / n] += arr[i];
-        sumVer[i % n] += arr[i];
-    }
-    sumHor.insert(sumHor.end(), sumVer.begin(), sumVer.end());
-    return sumHor;
-}
-
-vector<int> distanceVec(vector<int> arr, int srs = 0){
+// From annealing.cpp
+vector<int> distanceVec(vector<int> arr){
     vector<int> sumPillar(n * n, 0);
     vector<int> ans;
-    for(int i = 0; i < arr.size(); i += n * n){
+    for(int i = 0; i < (int)arr.size(); i += n * n){
         vector<int> temp;
         vector<int> sumHor(n, 0);
         for(int j = i; j < i + n * n; j++){
             sumPillar[j % (n * n)] += arr[j];
             sumHor[(j / n) % n] += arr[j];
         }
-        //vector<int> dm = distanceMatVec(temp, srs);
         ans.insert(ans.end(), sumHor.begin(), sumHor.end());
     }
-    for(int i = 0; i < arr.size(); i += n * n){
+    for(int i = 0; i < (int)arr.size(); i += n * n){
         vector<int> temp;
         vector<int> sumVer(n, 0);
         for(int j = i; j < i + n * n; j++){
             sumVer[j % n] += arr[j];
         }
-        //vector<int> dm = distanceMatVec(temp, srs);
         ans.insert(ans.end(), sumVer.begin(), sumVer.end());
     }
     ans.insert(ans.end(), sumPillar.begin(), sumPillar.end());
@@ -125,151 +109,21 @@ vector<int> distanceVec(vector<int> arr, int srs = 0){
     return ans;
 }
 
-long long distanceEff(int pos1, int pos2, long long curDist, vector<int> &cube, vector<int> &sumVec){
-    int i1, j1, k1;
-    int i2, j2, k2;
-    k1 = pos1 / (n * n);
-    k2 = pos2 / (n * n);
-    i1 = (pos1 / n) % n;
-    i2 = (pos2 / n) % n;
-    j1 = pos1 % n;
-    j2 = pos2 % n;
-    long long dE = curDist;
-    long long bef1 = cube[k1 * n * n + i1 * n + j1];
-    long long bef2 = cube[k2 * n * n + i2 * n + j2];
-    dE -= unitDist(sumVec[k1 * 5 + i1], c);
-    dE += unitDist(sumVec[k1 * 5 + i1] - bef1 + bef2, c);
-    sumVec[k1 * 5 + i1] += bef2 - bef1;
-    dE -= unitDist(sumVec[25 + k1 * 5 + j1], c);
-    dE += unitDist(sumVec[25 + k1 * 5 + j1] - bef1 + bef2, c);
-    sumVec[25 + k1 * 5 + j1] += bef2 - bef1;
-    dE -= unitDist(sumVec[50 + i1 * 5 + j1], c);
-    dE += unitDist(sumVec[50 + i1 * 5 + j1] - bef1 + bef2, c);
-    sumVec[50 + i1 * 5 + j1] += bef2 - bef1;
-
-    dE -= unitDist(sumVec[k2 * 5 + i2], c);
-    dE += unitDist(sumVec[k2 * 5 + i2] - bef2 + bef1, c);
-    sumVec[k2 * 5 + i2] += bef1 - bef2;
-    dE -= unitDist(sumVec[25 + k2 * 5 + j2], c);
-    dE += unitDist(sumVec[25 + k2 * 5 + j2] - bef2 + bef1, c);
-    sumVec[25 + k2 * 5 + j2] += bef1 - bef2;
-    dE -= unitDist(sumVec[50 + i2 * 5 + j2], c);
-    dE += unitDist(sumVec[50 + i2 * 5 + j2] - bef2 + bef1, c);
-    sumVec[50 + i2 * 5 + j2] += bef1 - bef2;
-
-    // D1
-    if(i1 == j1){
-        dE -= unitDist(sumVec[75 + 2 * k1], c);
-        dE += unitDist(sumVec[75 + 2 * k1] - bef1 + bef2, c);
-        sumVec[75 + 2 * k1] += bef2 - bef1;
-    }
-    if(i1 + j1 == n - 1){
-        dE -= unitDist(sumVec[75 + 2 * k1 + 1], c);
-        dE += unitDist(sumVec[75 + 2 * k1 + 1] - bef1 + bef2, c);
-        sumVec[75 + 2 * k1 + 1] += bef2 - bef1;
-    }
-    // D2
-    if(j1 == k1){
-        dE -= unitDist(sumVec[85 + 2 * i1], c);
-        dE += unitDist(sumVec[85 + 2 * i1] - bef1 + bef2, c);
-        sumVec[85 + 2 * i1] += bef2 - bef1;
-    }
-    if(j1 + k1 == n - 1){
-        dE -= unitDist(sumVec[85 + 2 * i1 + 1], c);
-        dE += unitDist(sumVec[85 + 2 * i1 + 1] - bef1 + bef2, c);
-        sumVec[85 + 2 * i1 + 1] += bef2 - bef1;
-    }
-
-    // D1
-    if(i2 == j2){
-        dE -= unitDist(sumVec[75 + 2 * k2], c);
-        dE += unitDist(sumVec[75 + 2 * k2] - bef2 + bef1, c);
-        sumVec[75 + 2 * k2] += bef1 - bef2;
-    }
-    if(i2 + j2 == n - 1){
-        dE -= unitDist(sumVec[75 + 2 * k2 + 1], c);
-        dE += unitDist(sumVec[75 + 2 * k2 + 1] - bef2 + bef1, c);
-        sumVec[75 + 2 * k2 + 1] += bef1 - bef2;
-    }
-    // D2
-    if(j2 == k2){
-        dE -= unitDist(sumVec[85 + 2 * i2], c);
-        dE += unitDist(sumVec[85 + 2 * i2] - bef2 + bef1, c);
-        sumVec[85 + 2 * i2] += bef1 - bef2;
-    }
-    if(j2 + k2 == n - 1){
-        dE -= unitDist(sumVec[85 + 2 * i2 + 1], c);
-        dE += unitDist(sumVec[85 + 2 * i2 + 1] - bef2 + bef1, c);
-        sumVec[85 + 2 * i2 + 1] += bef1 - bef2;
-    }
-
-    // DR1
-    if(i1 == j1 && j1 == k1){
-        dE -= unitDist(sumVec[95], c);
-        dE += unitDist(sumVec[95] - bef1 + bef2, c);
-        sumVec[95] += bef2 - bef1;
-    }
-    // DR2
-    if(i1 == k1 && i1 + j1 == n - 1){
-        dE -= unitDist(sumVec[96], c);
-        dE += unitDist(sumVec[96] - bef1 + bef2, c);
-        sumVec[96] += bef2 - bef1;
-    }
-    // DR3
-    if(j1 == k1 && i1 + j1 == n - 1){
-        dE -= unitDist(sumVec[97], c);
-        dE += unitDist(sumVec[97] - bef1 + bef2, c);
-        sumVec[97] += bef2 - bef1;
-    }
-    // DR4
-    if(i1 == j1 && i1 + k1 == n - 1){
-        dE -= unitDist(sumVec[98], c);
-        dE += unitDist(sumVec[98] - bef1 + bef2, c);
-        sumVec[98] += bef2 - bef1;
-    }
-
-    // DR1
-    if(i2 == j2 && j2 == k2){
-        dE -= unitDist(sumVec[95], c);
-        dE += unitDist(sumVec[95] - bef2 + bef1, c);
-        sumVec[95] += bef1 - bef2;
-    }
-    // DR2
-    if(i2 == k2 && i2 + j2 == n - 1){
-        dE -= unitDist(sumVec[96], c);
-        dE += unitDist(sumVec[96] - bef2 + bef1, c);
-        sumVec[96] += bef1 - bef2;
-    }
-    // DR3
-    if(j2 == k2 && i2 + j2 == n - 1){
-        dE -= unitDist(sumVec[97], c);
-        dE += unitDist(sumVec[97] - bef2 + bef1, c);
-        sumVec[97] += bef1 - bef2;
-    }
-    // DR4
-    if(i2 == j2 && i2 + k2 == n - 1){
-        dE -= unitDist(sumVec[98], c);
-        dE += unitDist(sumVec[98] - bef2 + bef1, c);
-        sumVec[98] += bef1 - bef2;
-    }
-    return dE;
-}
-
-
-long long distance(vector<int> &arr, int srs = 0){
+// From annealing.cpp
+long long distance(vector<int> &arr){
     int cnt = 0;
     vector<int> sumPillar(n * n, 0);
     long long ans = 0;
-    for(int i = 0; i < arr.size(); i += n * n){
+    for(int i = 0; i < (int)arr.size(); i += n * n){
         vector<int> temp;
         for(int j = i; j < i + n * n; j++){
             sumPillar[j % (n * n)] += arr[j];
             temp.push_back(arr[j]);
         }
-        ans += distanceMat(temp, srs);
+        ans += distanceMat(temp);
     }
     for(int i = 0; i < n * n; i++){
-        ans += unitDist(sumPillar[i], c, srs);
+        ans += unitDist(sumPillar[i], c);
     }
     int r1 = 0, c1 = 0;
     int r2 = 0, c2 = n - 1;
@@ -286,10 +140,10 @@ long long distance(vector<int> &arr, int srs = 0){
         r3--; c3++;
         r4--; c4--;
     }
-    ans += unitDist(s1, c, srs);
-    ans += unitDist(s2, c, srs);
-    ans += unitDist(s3, c, srs);
-    ans += unitDist(s4, c, srs);
+    ans += unitDist(s1, c);
+    ans += unitDist(s2, c);
+    ans += unitDist(s3, c);
+    ans += unitDist(s4, c);
     for(int k = 0; k < n; k++){
         int i1 = 0, j1 = 0;
         int i2 = 0, j2 = n - 1;
@@ -309,68 +163,46 @@ long long distance(vector<int> &arr, int srs = 0){
             i1++; i2++;
             j1++; j2--;
         }
-        ans += unitDist(st1, c, srs);
-        ans += unitDist(st2, c, srs);
-        ans += unitDist(st3, c, srs);
-        ans += unitDist(st4, c, srs);
-        //ans += unitDist(st5, c, srs);
-        //ans += unitDist(st6, c, srs);
+        ans += unitDist(st1, c);
+        ans += unitDist(st2, c);
+        ans += unitDist(st3, c);
+        ans += unitDist(st4, c);
+        //ans += unitDist(st5, c);
+        //ans += unitDist(st6, c);
     }
     return ans;
 }
 
-double getRandomNumber(double i,double j){
-    //cout<<"returning "<<(double(distribution(generator)))<<"\n";
-    return double(distribution(generator));
-}
-
-double getProbability(long long difference, double temperature){
-    return exp(-1 * difference / temperature);
-}
-
-/*
-int getRandomInt(int mini, int maxi){
-    random_device dev;
-    mt19937 rng(dev());
-    uniform_int_distribution<mt19937::result_type> dist(mini, maxi);
-    return dist(rng);
-}
-
-void evalAnswer(){
-    cin >> n;
-    vector<int> arr(n * n * n);
-    for(auto &x: arr) cin >> x;
-    int mini = INT_MAX;
-    c = n * (n * n * n + 1);
-    c /= 2;
-    int u = distance(arr);
-    for(int i = 0; i < n * n * n; i++){
-        for(int j = i + 1; j < n * n * n; j++){
-            swap(arr[i], arr[j]);
-            int k = distance(arr);
-            mini = min(mini, k);
-            swap(arr[i], arr[j]);
-        }
-    }
-    for(auto &x: distanceVec(arr)){
-        cout << x << " ";
-    }
-    cout << endl;
-    cout << u << endl;
-    cout << endl << " " << mini << endl;
-}*/
-
-int32_t main(){
-    //evalAnswer();
-    cin >> n;
-    auto beg = high_resolution_clock::now();
-    c = n * (n * n * n + 1);
-    c /= 2;
+// From genetic.cpp
+vector<int> makeRandomCube(int n) {
+    random_device rd;
+    mt19937 rng(rd());
 
     vector<int> cube;
     for(int i = 1; i <= n * n * n; i++){
         cube.push_back(i);
     }
+    shuffle(begin(cube), std::end(cube), rng);
+    for(int i = 0; i < cube.size(); i++){
+        if(cube[i] == 63){
+            swap(cube[i], cube[62]);
+            break;
+        }
+    }
+
+    return cube;
+}
+
+int32_t main(){
+    //evalAnswer();
+    cout << "Ukuran Kubus: ";
+    cin >> n;
+    auto beg = high_resolution_clock::now();
+    c = n * (n * n * n + 1);
+    c /= 2;
+
+    vector<int> cube = makeRandomCube(n);
+    vector<int> startingCube = cube;
     sumVec = distanceVec(cube);
 
     vector<int> ans;
@@ -386,50 +218,57 @@ int32_t main(){
 
     ofstream logs("hill-climbing_log.txt");
 
-    for(; curDist != 0 && steps <= 1e9 && decreasingVal; steps++) {
-    	decreasingVal = false;
+    while(decreasingVal) {
+				decreasingVal = false;
+				for(int pos1 = 0; pos1 < cube.size(); pos1++) {
+						for(int pos2 = pos1 + 1; pos2 < cube.size(); pos2++) {
+								swap(cube[pos1], cube[pos2]);
+								long long newDist = distance(cube);
 
-			for(int pos1 = 0; pos1 < cube.size(); pos1++) {
-				for(int pos2 = pos1 + 1; pos2 < cube.size(); pos2++) {
-					long long newDist = distanceEff(pos1, pos2, curDist, cube, sumVec);
+								if(newDist < curDist) {
+										curDist = newDist;
 
-					if(newDist < curDist) {
-						swap(cube[pos1], cube[pos2]);
-						curDist = newDist;
-
-						if(curDist < mini) {
-							ans = cube;
-							mini = curDist;
+										if(curDist < mini) {
+												ans = cube;
+												mini = curDist;
+										}
+										decreasingVal = true;
+								} else {
+										swap(cube[pos1], cube[pos2]);
+								}
 						}
-						decreasingVal = true;
-					}
 				}
-			}
-
-			if(steps % 1000000 == 0){
+				steps++;
 				cout << curDist << " " << steps << endl;
 				logs << curDist << " " << steps << endl;
-			}
     }
+    logs.close();
 
-	logs.close();
-	cout << "Steps: " << steps << endl;
-	cout << distance(ans, 1) << endl;
-	cout << "Real Array: " << endl;
-	for(auto &x: ans){
-		cout << x << " ";
-	}
-	cout << endl;
-	cout << "Cost func: " << endl;
-	for(auto &x: distanceVec(ans)){
-		cout << x << " ";
-	}
-	cout << endl;
-	cout.precision(18);
-	auto en = high_resolution_clock::now();
-	auto dur = duration_cast<microseconds>(en - beg);
-	cout << dur.count() << endl;
-	int u = 1;
-	while(u != 2){ cin >> u; }
-	return 0;
+		ofstream sc("start_cube.txt");
+		ofstream fc("final_cube.txt");
+
+		for(auto &x: startingCube){
+				sc << x << " ";
+		}
+		sc << endl;
+		sc.close();
+
+		for(auto &x: ans){
+				fc << x << " ";
+		}
+		fc << endl;
+		fc.close();
+
+		cout << endl;
+		cout << "Final objective function value: " << mini << endl;
+		auto en = high_resolution_clock::now();
+		auto dur = duration_cast<microseconds>(en - beg);
+		cout << "Duration (in microsec): " << dur.count() << endl;
+
+		system("python3 plot_cube.py start_cube.txt \"Starting Cube\"  && python3 plot_cube.py final_cube.txt \"Final Cube\"");
+
+		///** Sesuaikan dengan sistem anda! **/
+		system("python3 plot_annealing.py hill-climbing_log.txt I \"Objective function vs steps\"");
+
+		return 0;
 }
