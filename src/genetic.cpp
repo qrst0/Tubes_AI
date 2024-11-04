@@ -125,137 +125,6 @@ vector<int> distanceVec(vector<int> arr, int srs = 0){
     return ans;
 }
 
-long long distanceEff(int pos1, int pos2, long long curDist, vector<int> cube, vector<int> &sumVec){
-    int i1, j1, k1;
-    int i2, j2, k2;
-    k1 = pos1 / (n * n);
-    k2 = pos2 / (n * n);
-    i1 = (pos1 / n) % n;
-    i2 = (pos2 / n) % n;
-    j1 = pos1 % n;
-    j2 = pos2 % n;
-    long long dE = curDist;
-    long long bef1 = cube[k1 * n * n + i1 * n + j1];
-    long long bef2 = cube[k2 * n * n + i2 * n + j2];
-    dE -= unitDist(sumVec[k1 * 5 + i1], c);
-    dE += unitDist(sumVec[k1 * 5 + i1] - bef1 + bef2, c);
-    sumVec[k1 * 5 + i1] += bef2 - bef1;
-    dE -= unitDist(sumVec[25 + k1 * 5 + j1], c);
-    dE += unitDist(sumVec[25 + k1 * 5 + j1] - bef1 + bef2, c);
-    sumVec[25 + k1 * 5 + j1] += bef2 - bef1;
-    dE -= unitDist(sumVec[50 + i1 * 5 + j1], c);
-    dE += unitDist(sumVec[50 + i1 * 5 + j1] - bef1 + bef2, c);
-    sumVec[50 + i1 * 5 + j1] += bef2 - bef1;
-
-    dE -= unitDist(sumVec[k2 * 5 + i2], c);
-    dE += unitDist(sumVec[k2 * 5 + i2] - bef2 + bef1, c);
-    sumVec[k2 * 5 + i2] += bef1 - bef2;
-    dE -= unitDist(sumVec[25 + k2 * 5 + j2], c);
-    dE += unitDist(sumVec[25 + k2 * 5 + j2] - bef2 + bef1, c);
-    sumVec[25 + k2 * 5 + j2] += bef1 - bef2;
-    dE -= unitDist(sumVec[50 + i2 * 5 + j2], c);
-    dE += unitDist(sumVec[50 + i2 * 5 + j2] - bef2 + bef1, c);
-    sumVec[50 + i2 * 5 + j2] += bef1 - bef2;
-
-    // D1
-    if(i1 == j1){
-        dE -= unitDist(sumVec[75 + 2 * k1], c);
-        dE += unitDist(sumVec[75 + 2 * k1] - bef1 + bef2, c);
-        sumVec[75 + 2 * k1] += bef2 - bef1;
-    }
-    if(i1 + j1 == n - 1){
-        dE -= unitDist(sumVec[75 + 2 * k1 + 1], c);
-        dE += unitDist(sumVec[75 + 2 * k1 + 1] - bef1 + bef2, c);
-        sumVec[75 + 2 * k1 + 1] += bef2 - bef1;
-    }
-    // D2
-    if(j1 == k1){
-        dE -= unitDist(sumVec[85 + 2 * i1], c);
-        dE += unitDist(sumVec[85 + 2 * i1] - bef1 + bef2, c);
-        sumVec[85 + 2 * i1] += bef2 - bef1;
-    }
-    if(j1 + k1 == n - 1){
-        dE -= unitDist(sumVec[85 + 2 * i1 + 1], c);
-        dE += unitDist(sumVec[85 + 2 * i1 + 1] - bef1 + bef2, c);
-        sumVec[85 + 2 * i1 + 1] += bef2 - bef1;
-    }
-
-    // D1
-    if(i2 == j2){
-        dE -= unitDist(sumVec[75 + 2 * k2], c);
-        dE += unitDist(sumVec[75 + 2 * k2] - bef2 + bef1, c);
-        sumVec[75 + 2 * k2] += bef1 - bef2;
-    }
-    if(i2 + j2 == n - 1){
-        dE -= unitDist(sumVec[75 + 2 * k2 + 1], c);
-        dE += unitDist(sumVec[75 + 2 * k2 + 1] - bef2 + bef1, c);
-        sumVec[75 + 2 * k2 + 1] += bef1 - bef2;
-    }
-    // D2
-    if(j2 == k2){
-        dE -= unitDist(sumVec[85 + 2 * i2], c);
-        dE += unitDist(sumVec[85 + 2 * i2] - bef2 + bef1, c);
-        sumVec[85 + 2 * i2] += bef1 - bef2;
-    }
-    if(j2 + k2 == n - 1){
-        dE -= unitDist(sumVec[85 + 2 * i2 + 1], c);
-        dE += unitDist(sumVec[85 + 2 * i2 + 1] - bef2 + bef1, c);
-        sumVec[85 + 2 * i2 + 1] += bef1 - bef2;
-    }
-
-    // DR1
-    if(i1 == j1 && j1 == k1){
-        dE -= unitDist(sumVec[95], c);
-        dE += unitDist(sumVec[95] - bef1 + bef2, c);
-        sumVec[95] += bef2 - bef1;
-    }
-    // DR2
-    if(i1 == k1 && i1 + j1 == n - 1){
-        dE -= unitDist(sumVec[96], c);
-        dE += unitDist(sumVec[96] - bef1 + bef2, c);
-        sumVec[96] += bef2 - bef1;
-    }
-    // DR3
-    if(j1 == k1 && i1 + j1 == n - 1){
-        dE -= unitDist(sumVec[97], c);
-        dE += unitDist(sumVec[97] - bef1 + bef2, c);
-        sumVec[97] += bef2 - bef1;
-    }
-    // DR4
-    if(i1 == j1 && i1 + k1 == n - 1){
-        dE -= unitDist(sumVec[98], c);
-        dE += unitDist(sumVec[98] - bef1 + bef2, c);
-        sumVec[98] += bef2 - bef1;
-    }
-
-    // DR1
-    if(i2 == j2 && j2 == k2){
-        dE -= unitDist(sumVec[95], c);
-        dE += unitDist(sumVec[95] - bef2 + bef1, c);
-        sumVec[95] += bef1 - bef2;
-    }
-    // DR2
-    if(i2 == k2 && i2 + j2 == n - 1){
-        dE -= unitDist(sumVec[96], c);
-        dE += unitDist(sumVec[96] - bef2 + bef1, c);
-        sumVec[96] += bef1 - bef2;
-    }
-    // DR3
-    if(j2 == k2 && i2 + j2 == n - 1){
-        dE -= unitDist(sumVec[97], c);
-        dE += unitDist(sumVec[97] - bef2 + bef1, c);
-        sumVec[97] += bef1 - bef2;
-    }
-    // DR4
-    if(i2 == j2 && i2 + k2 == n - 1){
-        dE -= unitDist(sumVec[98], c);
-        dE += unitDist(sumVec[98] - bef2 + bef1, c);
-        sumVec[98] += bef1 - bef2;
-    }
-    return dE;
-}
-
-
 long long distance(vector<int> &arr, int srs = 0){
     int cnt = 0;
     vector<int> sumPillar(n * n, 0);
@@ -336,30 +205,6 @@ int getRandomInt(int mini, int maxi){
     return dist(rng);
 }
 
-void evalAnswer(){
-    cin >> n;
-    vector<int> arr(n * n * n);
-    for(auto &x: arr) cin >> x;
-    int mini = INT_MAX;
-    c = n * (n * n * n + 1);
-    c /= 2;
-    int u = distance(arr);
-    for(int i = 0; i < n * n * n; i++){
-        for(int j = i + 1; j < n * n * n; j++){
-            swap(arr[i], arr[j]);
-            int k = distance(arr);
-            mini = min(mini, k);
-            swap(arr[i], arr[j]);
-        }
-    }
-    for(auto &x: distanceVec(arr)){
-        cout << x << " ";
-    }
-    cout << endl;
-    cout << u << endl;
-    cout << endl << " " << mini << endl;
-}
-
 // utility func
 vector<int> makeRandomCube(int n) {
     random_device rd;
@@ -399,51 +244,46 @@ vector<vector<int>> makePopulation(int nPop, int n) {
 }
 
 vector<vector<int>> selection(vector<vector<int>> population) {
-    double total = 0;
-    vector<double> fitnessArr;
+    // sum objective function
+    double totalObjFunc = 0;
+    vector<double> objFuncArr;
     for (int i = 0; i < population.size(); i++) {
         vector<int> cube = population[i];
-        double fitness = distance(cube);    // fitness function
-        // cout << "Fitness[" << i << "]: " << fitness << "\n";
+        double objFunc = distance(cube);   
 
-        total += fitness;
+        totalObjFunc += objFunc;
+        objFuncArr.push_back(objFunc);
+    }
+
+    // find fitness
+    double totalFitness = 0;
+    vector<double> fitnessArr;
+    for (int i = 0; i < population.size(); i++) {
+        double fitness = totalObjFunc-objFuncArr[i]; // fitness function
+
+        totalFitness += fitness;
         fitnessArr.push_back(fitness);
     }
-    // cout << "Total: " << total << "\n";
 
-    double totalRev = 0;
-    vector<double> fitnessArrRev;
-    for (int i = 0; i < population.size(); i++) {
-        double fitness = total-fitnessArr[i];;    // fitness function
-        // cout << "Fitness[" << i << "]: " << fitness << "\n";
-
-        totalRev += fitness;
-        fitnessArrRev.push_back(fitness);
-    }
-    // cout << "Total: " << totalRev << "\n";
-
-    // cout << "Boundaries: \n";
+    // create boundaries for roulette wheel
     vector<double> boundaries; 
     for (int i = 0; i < population.size(); i++) {
-        double fitness = fitnessArrRev[i];
-        double portion = fitness/totalRev;
+        double fitness = fitnessArr[i];
+        double portion = fitness/totalFitness;
 
         if (i == 0) {
             boundaries.push_back(portion);   
         } else {
             boundaries.push_back(boundaries[i-1]+portion);
         }
-        // cout << fitness << "::";
-        // cout << boundaries[i] << " ";
     }
-    // cout << "\n";
 
+    // spin roulette wheel
     vector<vector<int>> selection;
     for (int i = 0; i < population.size(); i++) {
         int min = 0;
         int max = 100;
         double x = getRandomInt(min, max)/100.0;
-        // cout << "Random Select: " << x << " ";
 
         bool found = false;
         int j = 0;
@@ -515,7 +355,6 @@ vector<vector<int>> crossOver(vector<vector<int>> population) {
         int point2 = getRandomInt(0, n*n*n-2);  
         int start = min(point1, point2);
         int end = max(point1, point2);
-        // cout << "POINT: " << start << " " << end << endl;
 
         vector<int> parent1 = population[i];
         vector<int> parent2 = population[i+1];
@@ -523,27 +362,6 @@ vector<vector<int>> crossOver(vector<vector<int>> population) {
         vector<int> slice2(parent1.begin()+start, parent1.begin()+end+1);
         vector<int> child1;
         vector<int> child2;
-
-        // cout << "PARENT-1: ";
-        // for(int a = 0; a < parent1.size(); a++) {
-        //     cout << parent1[a] << " ";
-        // }
-        // cout << endl;
-        // cout << "PARENT-2: ";
-        // for(int a = 0; a < parent2.size(); a++) {
-        //     cout << parent2[a] << " ";
-        // }
-        // cout << endl;
-        // cout << "SLICE-1: ";
-        // for(int a = 0; a < slice1.size(); a++) {
-        //     cout << slice1[a] << " ";
-        // }
-        // cout << endl;
-        // cout << "SLICE-2: ";
-        // for(int a = 0; a < slice2.size(); a++) {
-        //     cout << slice2[a] << " ";
-        // }
-        // cout << endl;
 
         // cross over to child 1
         int j = 0; // iterator for parent
@@ -601,16 +419,6 @@ vector<vector<int>> crossOver(vector<vector<int>> population) {
         population[i] = child1;
         population[i+1] = child2;
 
-        // cout << "CHILD-1: ";
-        // for(int a = 0; a < population[i].size(); a++) {
-        //     cout << population[i][a] << " ";
-        // }
-        // cout << endl;
-        // cout << "CHILD-2: ";
-        // for(int a = 0; a < population[i+1].size(); a++) {
-        //     cout << population[i+1][a] << " ";
-        // }
-        // cout << endl;
     }
 
     return population;
@@ -666,7 +474,6 @@ long long findAverage(vector<vector<int>> population) {
 }
 
 int32_t main(){
-    //evalAnswer();
     cout << "Ukuran Kubus: ";
     cin >> n;
 
@@ -685,6 +492,7 @@ int32_t main(){
     vector<vector<int>> population = makePopulation(nPop, n);
     cout << "Start Population: \n";
     for (int i = 0; i < population.size(); i++) {
+        cout << "Cube " << i+1 << ": \n";
         printCube(population[i]);
     }
     
@@ -703,47 +511,19 @@ int32_t main(){
 
     for (int itr = 0; itr < maxIter; itr++){
         // selection
-        // cout << "Selection: \n";
-        
         vector<vector<int>> selectionRes = selection(population);
-        
-        // for (int i = 0; i < selectionRes.size(); i++) {
-        //     printCube(selectionRes[i]);
-        // }
 
         // Cross-Over
-        // cout << "Cross Over: \n";
-
         vector<vector<int>> crossOverRes = crossOver(selectionRes);
         
-        // for (int i = 0; i < crossOverRes.size(); i++) {
-        //     printCube(crossOverRes[i]);
-        // }
-
         // mutation
-        // cout << "Mutation: \n";
-
         vector<vector<int>> mutationRes = mutation(crossOverRes);
 
-        // for (int i = 0; i < mutationRes.size(); i++) {
-        //     cout << "Cube-" << i << ":\n";
-        //     printCube(mutationRes[i]);
-        // }
-
-        // for (int i = 0; i < mutationRes.size(); i++) {
-        //     cout << "Cube " << i << ": " << distance(mutationRes[i]) << "\n";
-        // }
-
-        // Redo iteration
+        // next iteration
         population = mutationRes;
 
         if (itr > 0 && itr != maxIter-1 && (itr+1) % 20 == 0) {
             cout << "Iteration-" << itr+1 << ": \n";
-            // cout << "Population: \n";
-            // for (int i = 0; i < population.size(); i++) {
-            //     printCube(population[i]);
-            //     cout << "Fitness Cube " << i+1 << ": " << distance(population[i]) << "\n";
-            // }
 
             long long averageItr = findAverage(population);
             cout << "Average Fitness: " << averageItr << endl;
@@ -757,6 +537,7 @@ int32_t main(){
 
     cout << "Final Population: \n";
     for (int i = 0; i < population.size(); i++) {
+        cout << "Cube " << i+1 << ": \n";
         printCube(population[i]);
     }
 
