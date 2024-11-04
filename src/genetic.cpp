@@ -641,6 +641,30 @@ vector<vector<int>> mutation(vector<vector<int>> population) {
     return population;
 }
 
+long long findOptimum(vector<vector<int>> population) {
+    long long optimum = distance(population[0]);
+
+    for (int i = 1; i < population.size(); i++) {
+        long long fitness = distance(population[i]);
+        if (fitness < optimum) {
+            optimum = fitness;
+        }
+    }
+
+    return optimum;
+}
+
+long long findAverage(vector<vector<int>> population) {
+    long long average = 0;
+
+    for (int i = 0; i < population.size(); i++) {
+        long long fitness = distance(population[i]);
+        average += fitness;
+    }
+
+    return average/population.size();
+}
+
 int32_t main(){
     //evalAnswer();
     cout << "Ukuran Kubus: ";
@@ -659,10 +683,23 @@ int32_t main(){
 
     // make the cube
     vector<vector<int>> population = makePopulation(nPop, n);
-    cout << "Population: \n";
+    cout << "Start Population: \n";
     for (int i = 0; i < population.size(); i++) {
         printCube(population[i]);
     }
+    
+    for (int i = 0; i < population.size(); i++) {
+        long long fitness = distance(population[i]);
+
+        cout << "Fitness Cube " << i+1 << ": " << fitness << "\n";
+    }
+    long long averageStart = findAverage(population);
+    cout << "Average Fitness: " << averageStart << endl;
+    long long optimumStart = findOptimum(population);
+    cout << "Optimum: " << optimumStart << endl;
+
+    ofstream logs("genetic_log.txt");
+    logs << optimumStart << " " << averageStart << " " << 0 << endl;
 
     for (int itr = 0; itr < maxIter; itr++){
         // selection
@@ -700,12 +737,21 @@ int32_t main(){
         // Redo iteration
         population = mutationRes;
 
-        if (itr > 0 && itr % 100 == 0) {
-            cout << "Iteration-" << itr << " Population: \n";
-            for (int i = 0; i < population.size(); i++) {
-                printCube(population[i]);
-                cout << "Fitness Cube " << i << ": " << distance(population[i]) << "\n";
-            }
+        if (itr > 0 && itr != maxIter-1 && (itr+1) % 20 == 0) {
+            cout << "Iteration-" << itr+1 << ": \n";
+            // cout << "Population: \n";
+            // for (int i = 0; i < population.size(); i++) {
+            //     printCube(population[i]);
+            //     cout << "Fitness Cube " << i+1 << ": " << distance(population[i]) << "\n";
+            // }
+
+            long long averageItr = findAverage(population);
+            cout << "Average Fitness: " << averageItr << endl;
+
+            long long optimumItr = findOptimum(population);
+            cout << "Optimum: " << optimumItr << endl;
+
+            logs << optimumItr << " " << averageItr << " " << itr+1 << endl;
         }
     }
 
@@ -713,15 +759,27 @@ int32_t main(){
     for (int i = 0; i < population.size(); i++) {
         printCube(population[i]);
     }
+
     for (int i = 0; i < population.size(); i++) {
-        cout << "Fitness Cube " << i << ": " << distance(population[i]) << "\n";
+        cout << "Fitness Cube " << i+1 << ": " << distance(population[i]) << "\n";
     }
 
-    cout << "Finish" << endl;
+    long long averageEnd = findAverage(population);
+    cout << "Average Fitness: " << averageEnd << endl;
+
+    long long optimumEnd = findOptimum(population);
+    cout << "Optimum: " << optimumEnd << endl;
+
+    logs << optimumEnd << " " << averageEnd << " " << maxIter << endl;
 
     auto en = high_resolution_clock::now();
     auto dur = duration_cast<microseconds>(en - beg);
-    cout << dur.count() << endl;
+    cout << "Duration (in microsec): " << dur.count() << endl;
     
+    ///** Sesuaikan dengan sistem anda! **/
+    system("C:/Python312/python.exe plot_genetic.py genetic_log.txt I log");\
+
+    int u = 1;
+    while(u != 2){ cin >> u; }
     return 0;
 }
