@@ -4,12 +4,12 @@ import sys
 
 filename = sys.argv[1]
 f = sys.argv[2]
+title = sys.argv[3]
 
 intOk = True
 if f == "F":
     intOk = False
  
-print(filename, intOk)
 
 xpoints = []
 ypoints = []
@@ -41,4 +41,5 @@ xpoints = np.array(xpoints)
 ypoints = np.array(ypoints)
 
 plt.plot(xpoints, ypoints)
+plt.title(title)
 plt.show()

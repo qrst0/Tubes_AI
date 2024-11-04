@@ -323,8 +323,9 @@ int32_t main(){
     uniform_int_distribution<mt19937::result_type> dist2(0, n * n * n - 2);
 
     vector<int> ans;
+    vector<int> startingCube = cube;
     long long curDist = distance(cube);
-    double temperature = 1e10, coolingRate = 0.99999997, constTemp = 5, absoluteZero = 1e-8;
+    double temperature = 1e11, coolingRate = 0.9999993, constTemp = 5, absoluteZero = 1e-7;
     long long difference;
     int pos1, pos2;
     int steps = 0;
@@ -335,7 +336,7 @@ int32_t main(){
     ofstream logs("annealing_log.txt");
     ofstream delog("annealing_delta_e_log.txt");
 
-    for(; temperature > absoluteZero && curDist != 0 && steps <= 1e9; steps++, temperature *= coolingRate){
+    for(; temperature > absoluteZero && curDist != 0; temperature *= coolingRate){
         pos1 = dist1(rng);
         pos2 = dist2(rng);
         if(pos2 >= pos1) pos2++;
@@ -366,31 +367,40 @@ int32_t main(){
             logs << curDist << " " << steps << endl;
             delog << currentdE << " " << steps << endl;
         }
+        steps++;
     }
     assert(distance(ans) == mini);
     logs.close();
     delog.close();
-    cout << "Steps: " << steps << endl;
-    cout << distance(ans) << endl;
-    cout << "Real Array: " << endl;
+
+    ofstream sc("start_cube.txt");
+    ofstream fc("final_cube.txt");
+
+    for(auto &x: startingCube){
+        sc << x << " ";
+    }
+    sc << endl;
+    sc.close();
+
     for(auto &x: ans){
-        cout << x << " ";
+        fc << x << " ";
     }
+    fc << endl;
+
+    fc.close();
+
+
+    system("C:/Python312/python.exe plot_cube.py start_cube.txt \"Starting Cube\"  && C:/Python312/python.exe plot_cube.py final_cube.txt \"Final Cube\"");
+
     cout << endl;
-    cout << "Cost func: " << endl;
-    for(auto &x: distanceVec(ans)){
-        cout << x << " ";
-    }
-    cout << endl;
-    cout.precision(18);
-    cout << "Temperature: " << temperature << endl;
+    cout << "Final objective function value: " << mini << endl;
     auto en = high_resolution_clock::now();
     auto dur = duration_cast<microseconds>(en - beg);
     cout << "Duration (in microsec): " << dur.count() << endl;
     int u = 1;
 
     ///** Sesuaikan dengan sistem anda! **/
-    system("C:/Python312/python.exe plot.py annealing_log.txt I log && C:/Python312/python.exe plot.py annealing_delta_e_log.txt F linear");\
+    system("C:/Python312/python.exe plot.py annealing_log.txt I \"Objective function vs steps\" && C:/Python312/python.exe plot.py annealing_delta_e_log.txt F \"e^delta E/T vs steps\"");
 
     while(u != 2){ cin >> u; }
     return 0;
