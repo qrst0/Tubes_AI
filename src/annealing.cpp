@@ -400,7 +400,7 @@ int32_t main(){
     int u = 1;
 
     ///** Sesuaikan dengan sistem anda! **/
-    system("C:/Python312/python.exe plot.py annealing_log.txt I \"Objective function vs steps\" && C:/Python312/python.exe plot.py annealing_delta_e_log.txt F \"e^delta E/T vs steps\"");
+    system("C:/Python312/python.exe plot_annealing.py annealing_log.txt I \"Objective function vs steps\" && C:/Python312/python.exe plot_annealing.py annealing_delta_e_log.txt F \"e^delta E/T vs steps\"");
 
     while(u != 2){ cin >> u; }
     return 0;
