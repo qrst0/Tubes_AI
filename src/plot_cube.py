@@ -35,6 +35,6 @@ for i in range(size):
 
 ax.set_axis_off()
 
-ax.set_title(title, pad=20)
+ax.set_title(title)
 
 plt.show()

@@ -391,10 +391,11 @@ int32_t main(){
 
 			for(int pos1 = 0; pos1 < cube.size(); pos1++) {
 				for(int pos2 = pos1 + 1; pos2 < cube.size(); pos2++) {
-					long long newDist = distanceEff(pos1, pos2, curDist, cube, sumVec);
+
+                    swap(cube[pos1], cube[pos2]);
+					long long newDist = distance(cube);
 
 					if(newDist < curDist) {
-						swap(cube[pos1], cube[pos2]);
 						curDist = newDist;
 
 						if(curDist < mini) {
@@ -402,7 +403,9 @@ int32_t main(){
 							mini = curDist;
 						}
 						decreasingVal = true;
-					}
+					}else{
+                        swap(cube[pos1], cube[pos2]);
+                    }
 				}
 			}
 

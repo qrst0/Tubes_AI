@@ -331,6 +331,7 @@ int32_t main(){
     int steps = 0;
     int maxFail = 2e6;
     int minToRestart = 64;
+    int stuck = 0;
     long long mini = LLONG_MAX;
 
     ofstream logs("annealing_log.txt");
@@ -349,7 +350,10 @@ int32_t main(){
         difference = newDist - curDist;
         double currentdE = 1;
 
-        if(difference > 0) currentdE = getProbability(difference, temperature);
+        if(difference > 0){
+            currentdE = getProbability(difference, temperature);
+            stuck++;
+        }
 
         if(difference < 0 or (difference > 0 and currentdE > double(distribution(generator)))) {
             curDist = newDist;
@@ -369,9 +373,16 @@ int32_t main(){
         }
         steps++;
     }
+    auto en = high_resolution_clock::now();
     assert(distance(ans) == mini);
     logs.close();
     delog.close();
+
+    cout << endl;
+    cout << "Final objective function value: " << mini << endl;
+    cout << "Stuck frequency: " << stuck << endl;
+    auto dur = duration_cast<microseconds>(en - beg);
+    cout << "Duration (in microsec): " << dur.count() << endl;
 
     ofstream sc("start_cube.txt");
     ofstream fc("final_cube.txt");
@@ -392,11 +403,6 @@ int32_t main(){
 
     system("C:/Python312/python.exe plot_cube.py start_cube.txt \"Starting Cube\"  && C:/Python312/python.exe plot_cube.py final_cube.txt \"Final Cube\"");
 
-    cout << endl;
-    cout << "Final objective function value: " << mini << endl;
-    auto en = high_resolution_clock::now();
-    auto dur = duration_cast<microseconds>(en - beg);
-    cout << "Duration (in microsec): " << dur.count() << endl;
     int u = 1;
 
     ///** Sesuaikan dengan sistem anda! **/
