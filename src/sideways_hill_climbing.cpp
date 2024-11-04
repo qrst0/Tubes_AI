@@ -5,7 +5,7 @@
 using namespace std;
 using namespace std::chrono;
 
-int n, c;
+int n, c, max_side;
 
 // notation: https://drive.google.com/file/d/1GC2jjehBaVT8eMVL-qbUNi2qrkReFUAY/view?usp=sharing
 // [R1, R2, R3, diagonal D1, diagonal D2, DR1, DR2, DR3, DR4]
@@ -197,6 +197,8 @@ int32_t main(){
     //evalAnswer();
     cout << "Ukuran Kubus: ";
     cin >> n;
+    cout << "Maksimal Sideways Move: ";
+		cin >> max_side;
     auto beg = high_resolution_clock::now();
     c = n * (n * n * n + 1);
     c /= 2;
@@ -225,14 +227,21 @@ int32_t main(){
 								swap(cube[pos1], cube[pos2]);
 								long long newDist = distance(cube);
 
-								if(newDist <= curDist) {
+								if(newDist < curDist) {
 										curDist = newDist;
 
-										if(curDist <= mini) {
+										if(curDist < mini) {
 												ans = cube;
 												mini = curDist;
 										}
 										decreasingVal = true;
+								} else if(newDist == curDist && max_side > 0) {
+										max_side--;
+										curDist = newDist;
+										if(curDist == mini) {
+												ans = cube;
+												mini = curDist;
+										}
 								} else {
 										swap(cube[pos1], cube[pos2]);
 								}
